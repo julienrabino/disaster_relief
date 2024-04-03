@@ -27,7 +27,7 @@ public class DisasterVictimTest {
     private String expectedFirstName = "Freda";
     private String EXPECTED_ENTRY_DATE = "2024-01-18";
     private String validDate = "2024-01-15";
-    private String invalidDate = "15/13/2024";
+    private String invalidDate = "2024/12/20";
     private String expectedComments = "Needs medical attention and speaks 2 languages";
     private File file;
 
@@ -89,7 +89,12 @@ public class DisasterVictimTest {
         // Expecting IllegalArgumentException due to invalid date format
     }
 
-
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithInvalidEntryDate() {
+        String invalidEntryDate = "18000-01-4";
+        new DisasterVictim("Freda", invalidEntryDate);
+        // Expecting IllegalArgumentException due to invalid date
+    }
     /*
       testSetAndGetFirstName:
          - setFirstName() method updates the victim's firstName
@@ -472,14 +477,20 @@ public class DisasterVictimTest {
     }
 
     /*
-        testSetDateOfBirthWithInvalidDate:
+        testSetDateOfBirthWithInvalidDateFormat:
             - Tests setting the date of birth with an invalid date.
             - Expected Result: Expecting IllegalArgumentException due to invalid date format.
     */
     @Test(expected = IllegalArgumentException.class)
-    public void testSetDateOfBirthWithInvalidDate(){
+    public void testSetDateOfBirthWithInvalidDateFormat(){
         victim.setDateOfBirth(invalidDate);
          // Expecting IllegalArgumentException due to invalid date format
+
+    }
+    @Test(expected = IllegalArgumentException.class)
+    public void testSetDateOfBirthWithInvalidDate(){
+        victim.setDateOfBirth("20000-03-02");
+        // Expecting IllegalArgumentException due to invalid date
 
     }
 /*

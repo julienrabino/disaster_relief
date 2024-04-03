@@ -26,7 +26,7 @@ public class DisasterVictim implements Person{
 	private final String ENTRY_DATE;
 	private ArrayList<Supply> personalBelongings;
 	private String gender;
-	private static int counter = 0;
+	private static int counter = DisasterVictimEntry.currentIDCount;
 	private boolean ageKnown;
 	private boolean birthdateKnown;
 	private HashSet<DietaryRestrictions> dietaryRestrictions;
@@ -47,10 +47,17 @@ public class DisasterVictim implements Person{
 		Pattern PATTERN = Pattern.compile(REGEX);
 		Matcher match = PATTERN.matcher(ENTRY_DATE);
 		boolean valid_date = match.find();
-		
+
+		String[] tokens = ENTRY_DATE.split("-");
+		if(tokens[0].length() != 4){
+			valid_date = false;
+		}else if(tokens[1].length() != 2 || tokens[2].length() !=2){
+			valid_date=false;
+		}
 		if (!valid_date){
 			throw new IllegalArgumentException("Invalid format for date");
 		}
+
 		
 		this.firstName = firstName;
 		this.ENTRY_DATE = ENTRY_DATE;
@@ -60,8 +67,8 @@ public class DisasterVictim implements Person{
 		this.birthdateKnown = false;
 		this.age = 0;
 		this.comments = null;
-		this.ASSIGNED_SOCIAL_ID = counter;
 		counter++;
+		this.ASSIGNED_SOCIAL_ID = counter;
 		this.medicalRecords = new ArrayList<>();
 		this.familyConnections = new ArrayList<>();
 		this.personalBelongings = new ArrayList<>();
@@ -107,7 +114,12 @@ public class DisasterVictim implements Person{
 		Pattern PATTERN = Pattern.compile(REGEX);
 		Matcher match = PATTERN.matcher(dateOfBirth);
 		boolean valid_date = match.find();
-		
+		String[] tokens = dateOfBirth.split("-");
+		if(tokens[0].length() != 4){
+			valid_date = false;
+		}else if(tokens[1].length() != 2 || tokens[2].length() !=2){
+			valid_date=false;
+		}
 		if (!valid_date){
 			throw new IllegalArgumentException("Invalid format for date");
 		}
@@ -149,7 +161,7 @@ public class DisasterVictim implements Person{
 
 	public void setGender(String gender){
 		for (String genderOption: genderOptions){
-			if (gender.equals(genderOption)){
+			if (gender.equalsIgnoreCase(genderOption)){
 				this.gender = gender;
 				return;
 			}
