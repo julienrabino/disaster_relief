@@ -78,7 +78,13 @@ public class DisasterVictimTest {
     }
 
 
+    @Test public void testConstructorWithIDArgument(){
+
+        DisasterVictim victim = new DisasterVictim(1, "Lola","2024-03-03");
+        assertNotNull("Constructor should successfully create an instance with the given id", victim);
+    }
     /*
+
      testConstructorWithInvalidEntryDateFormat:
         - Expected Result: IllegalArgumentException should be thrown due to the invalid date format.
      */

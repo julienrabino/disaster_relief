@@ -12,6 +12,10 @@ public class MedicalRecord {
         this.setTreatmentDetails(treatmentDetails);
         this.setDateOfTreatment(dateOfTreatment);
     }
+    public MedicalRecord(String treatmentDetails, String dateOfTreatment){
+        this.setTreatmentDetails(treatmentDetails);
+        this.setDateOfTreatment(dateOfTreatment);
+    }
 
     public Location getLocation(){
         return this.Location;
@@ -35,11 +39,18 @@ public class MedicalRecord {
     }
 
     public void setDateOfTreatment(String date) throws IllegalArgumentException{
-        Pattern datePattern = Pattern.compile("^\\d{4}[-]{1}\\d{2}[-]{1}\\d{2}");
-        Matcher myMatcher = datePattern.matcher(date);
-        if (!myMatcher.find()){
-            throw new IllegalArgumentException("Invalid date");
-
+        String REGEX = "\\d{4}-\\d{2}-\\d{2}";
+        Pattern PATTERN = Pattern.compile(REGEX);
+        Matcher match = PATTERN.matcher(date);
+        boolean valid_date = match.find();
+        String[] tokens = date.split("-");
+        if(tokens[0].length() != 4){
+            valid_date = false;
+        }else if(tokens[1].length() != 2 || tokens[2].length() !=2){
+            valid_date=false;
+        }
+        if (!valid_date){
+            throw new IllegalArgumentException("Invalid format for date");
         }
         this.dateOfTreatment = date;
     }

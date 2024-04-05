@@ -30,6 +30,6 @@ public class FamilyRelation {
         return new FamilyRelation(this.getPersonOne(), this.getPersonTwo());
     }
     public String getRelationshipTo() {
-        return "family-relation";
+        return "other";
     }
 }

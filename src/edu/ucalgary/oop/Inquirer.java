@@ -4,11 +4,22 @@ public class Inquirer implements Person {
     private String FIRST_NAME;
     private String LAST_NAME;
     private String SERVICES_PHONE;
+    public static int counter = LoggingQueries.inquirerCurrentIDCount;
+    public int id;
     
     public Inquirer(String FIRST_NAME, String LAST_NAME, String SERVICES_PHONE){
       this.FIRST_NAME = FIRST_NAME;
       this.LAST_NAME = LAST_NAME;
       this.SERVICES_PHONE = SERVICES_PHONE;
+      counter++;
+      this.id = counter;
+
+    }
+    public Inquirer(int id, String FIRST_NAME, String LAST_NAME, String SERVICES_PHONE){
+        this.FIRST_NAME = FIRST_NAME;
+        this.LAST_NAME = LAST_NAME;
+        this.SERVICES_PHONE = SERVICES_PHONE;
+        this.id = id;
 
     }
 

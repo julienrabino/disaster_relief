@@ -34,7 +34,7 @@ public class SiblingRelationTest {
      */
     @Test
     public void testGetRelationshipTo(){
-        assertEquals("The relationship between the disaster victims should be sibling",siblingRelation.getRelationshipTo(),"sibling");
+        assertEquals("The relationship between the disaster victims should be sibling",siblingRelation.getRelationshipTo(),"siblings");
     }
 
     /*

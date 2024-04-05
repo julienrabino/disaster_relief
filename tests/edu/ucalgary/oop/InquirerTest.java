@@ -32,6 +32,13 @@ testObjectCreation -> means testing Inquirer constructor:
         assertNotNull("Constructor should have made a new Inquirer object",inquirer);
     }
 
+    @Test
+    public void testConstructorWithIDArgument(){
+        inquirer = new Inquirer(1, expectedFirstName,expectedFirstName,expectedPhoneNumber);
+
+            assertNotNull("Constructor should have made a new Inquirer object", inquirer);
+    }
+
     /*
        testSetAndGetFirstName:
           - Verifies that the setFirstName() and getFirstName() methods work correctly.

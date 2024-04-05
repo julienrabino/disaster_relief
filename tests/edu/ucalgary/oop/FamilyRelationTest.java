@@ -43,7 +43,7 @@ public class FamilyRelationTest {
 
     @Test
     public void testGetRelationshipTo(){
-        assertEquals("the relationship between the two victims should be 'family-relation'", testFamilyRelationObject.getRelationshipTo(), "family-relation");
+        assertEquals("the relationship between the two victims should be 'family-relation'", testFamilyRelationObject.getRelationshipTo(), "other");
     }
 
     /*

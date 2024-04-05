@@ -1,5 +1,4 @@
 package edu.ucalgary.oop;
-import org.junit.Test;
 
 import java.util.LinkedHashSet;
 import java.util.regex.*;
@@ -10,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashSet;
 
-import static org.junit.Assert.assertEquals;
 
 public class DisasterVictim implements Person{
 	
@@ -69,6 +67,40 @@ public class DisasterVictim implements Person{
 		this.comments = null;
 		counter++;
 		this.ASSIGNED_SOCIAL_ID = counter;
+		this.medicalRecords = new ArrayList<>();
+		this.familyConnections = new ArrayList<>();
+		this.personalBelongings = new ArrayList<>();
+		this.dietaryRestrictions = new HashSet<>();
+		this.location = null;
+		this.gender = null;
+	}
+
+	public DisasterVictim(int id, String firstName, String ENTRY_DATE) throws IllegalArgumentException{
+		String REGEX = "\\d{4}-\\d{2}-\\d{2}";
+		Pattern PATTERN = Pattern.compile(REGEX);
+		Matcher match = PATTERN.matcher(ENTRY_DATE);
+		boolean valid_date = match.find();
+
+		String[] tokens = ENTRY_DATE.split("-");
+		if(tokens[0].length() != 4){
+			valid_date = false;
+		}else if(tokens[1].length() != 2 || tokens[2].length() !=2){
+			valid_date=false;
+		}
+		if (!valid_date){
+			throw new IllegalArgumentException("Invalid format for date");
+		}
+
+
+		this.firstName = firstName;
+		this.ENTRY_DATE = ENTRY_DATE;
+		this.lastName = null;
+		this.dateOfBirth = null;
+		this.ageKnown = false;
+		this.birthdateKnown = false;
+		this.age = 0;
+		this.comments = null;
+		this.ASSIGNED_SOCIAL_ID = id;
 		this.medicalRecords = new ArrayList<>();
 		this.familyConnections = new ArrayList<>();
 		this.personalBelongings = new ArrayList<>();
@@ -290,8 +322,8 @@ public class DisasterVictim implements Person{
 
 	}
 	private void createFamilyRelation(DisasterVictim person, FamilyRelation relation, String relationshipType){
-		if (relation.getRelationshipTo().equals("sibling")){
-			if (relationshipType.equals("sibling")){
+		if (relation.getRelationshipTo().equals("siblings")){
+			if (relationshipType.equals("siblings")){
 				SiblingRelation siblingRelation = new SiblingRelation(person, relation.getPersonTwo());
 				person.addFamilyConnection(siblingRelation);
 			}
@@ -313,7 +345,7 @@ public class DisasterVictim implements Person{
 				MarriageRelation marriageRelation = new MarriageRelation(person, relation.getPersonTwo());
 				person.addFamilyConnection(marriageRelation);
 			}
-			else if (relationshipType.equals("married") || relationshipType.equals("sibling")){
+			else if (relationshipType.equals("married") || relationshipType.equals("siblings")){
 				ParentChildRelation parentChildRelation = new ParentChildRelation(person, relation.getPersonTwo());
 				person.addFamilyConnection(parentChildRelation);
 			}
@@ -331,7 +363,7 @@ public class DisasterVictim implements Person{
 				person.addFamilyConnection(parentChildRelation);
 			}
 
-			else if (relationshipType.equals("family-relation") || relationshipType.equals("sibling")){
+			else if (relationshipType.equals("other") || relationshipType.equals("sibling")){
 				FamilyRelation familyRelation = new FamilyRelation(person, relation.getPersonTwo());
 				person.addFamilyConnection(familyRelation);
 
@@ -339,7 +371,7 @@ public class DisasterVictim implements Person{
 
 
 		}
-		else if(relation.getRelationshipTo().equals("family-relation")){
+		else if(relation.getRelationshipTo().equals("other")){
 			FamilyRelation familyRelation = new FamilyRelation(person, relation.getPersonTwo());
 			person.addFamilyConnection(familyRelation);
 
@@ -376,7 +408,7 @@ public class DisasterVictim implements Person{
 			String line = inputStream.readLine();
 
 			while (line != null){
-				genderOptions.add(line);
+				genderOptions.add(line.trim());
 				line = inputStream.readLine();
 			}
 			inputStream.close();

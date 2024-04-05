@@ -1,22 +1,30 @@
 package edu.ucalgary.oop;
+
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 public class DisasterVictimEntry {
     private Connection dbConnect;
     private ResultSet results;
     public static int currentIDCount;
+    public static ArrayList<DisasterVictim> currentDisasterVictims;
+
     public DisasterVictimEntry() {
     }
 
-    public void createConnection() throws SQLException{
+    public void createConnection() throws SQLException {
         dbConnect = DriverManager.getConnection("jdbc:postgresql://localhost/reliefservice", "oop", "ucalgary");
 
     }
 
-    public void initializeCurrentIDCount() throws SQLException{
+    public void initializeCurrentIDCount() throws SQLException {
         Statement myStmt = dbConnect.createStatement();
         results = myStmt.executeQuery("SELECT MAX(id) FROM disastervictim");
         results.next();
@@ -25,11 +33,11 @@ public class DisasterVictimEntry {
 
     }
 
-    public ArrayList<String> getLocationIDs()throws SQLException{
-        ArrayList <String> locationIDs= new ArrayList<>();
+    public ArrayList<String> getLocationIDs() throws SQLException {
+        ArrayList<String> locationIDs = new ArrayList<>();
         Statement myStmt = dbConnect.createStatement();
         results = myStmt.executeQuery("SELECT id FROM location");
-        while (results.next()){
+        while (results.next()) {
             locationIDs.add(results.getString("id"));
         }
 
@@ -38,20 +46,49 @@ public class DisasterVictimEntry {
 
     }
 
-    public String getLocationNameFromID(int id) throws SQLException{
+    public ArrayList<String> getVictimIDs(int locationID) throws SQLException {
+        ArrayList<String> victimIDs = new ArrayList<>();
+
+        if (locationID == 0){
+            Statement myStmt = dbConnect.createStatement();
+            results = myStmt.executeQuery("SELECT id FROM  disastervictim");
+            while (results.next()) {
+                victimIDs.add(results.getString("id"));
+            }
+            myStmt.close();
+            return victimIDs;
+
+        }else {
+            PreparedStatement myStmt = dbConnect.prepareStatement("SELECT id FROM disastervictim where locationid = ?");
+            myStmt.setInt(1, locationID);
+            results = myStmt.executeQuery();
+            while (results.next()) {
+                victimIDs.add(results.getString("id"));
+            }
+            myStmt.close();
+
+            return victimIDs;
+
+        }
+
+
+    }
+
+    public String getLocationNameFromID(int id) throws SQLException {
         StringBuffer name = new StringBuffer();
         String query = "SELECT name FROM location WHERE id = (?)";
         PreparedStatement myStmt = dbConnect.prepareStatement(query);
         myStmt.setInt(1, id);
         results = myStmt.executeQuery();
 
-        while (results.next()){
+        while (results.next()) {
             name.append(results.getString("name"));
         }
 
         return name.toString();
     }
-    public String selectLocations() throws SQLException{
+
+    public String selectLocations() throws SQLException {
         StringBuffer locations = new StringBuffer();
         Statement myStmt = dbConnect.createStatement();
         results = myStmt.executeQuery("SELECT * FROM location");
@@ -59,37 +96,161 @@ public class DisasterVictimEntry {
         locations.append("************\n");
         locations.append("id, name\n");
         locations.append("************\n");
-        while (results.next()){
-            locations.append(results.getString("id")+ ", " + results.getString("name")+ "\n");
+        while (results.next()) {
+            locations.append(results.getString("id") + ", " + results.getString("name") + "\n");
         }
         myStmt.close();
         return locations.toString();
     }
-    public String selectDisasterVictims() throws SQLException {
 
+    public String selectDisasterVictims(int locationID) throws SQLException {
         StringBuffer disasterVictims = new StringBuffer();
+        String query;
+        if (locationID == 0) {
+            Statement myStmt = dbConnect.createStatement();
+             results = myStmt.executeQuery("SELECT * FROM disastervictim");
+            disasterVictims.append("*************************************************************************************\n");
+            disasterVictims.append("id, first name, last name, age, birthdate, comments, location id, gender, entry date \n");
+            disasterVictims.append("*************************************************************************************\n");
 
-        Statement myStmt = dbConnect.createStatement();
-        results = myStmt.executeQuery("SELECT * FROM disastervictim");
-        disasterVictims.append("Here are all the Disaster Victims:\n");
-        disasterVictims.append("*************************************************************************************\n");
-        disasterVictims.append("id, first name, last name, age, birthdate, comments, location id, gender, entry date \n");
-        disasterVictims.append("*************************************************************************************\n");
+            while (results.next()) {
+                disasterVictims.append(results.getString("id") + ", " + results.getString("firstName") + ", " +
+                        results.getString("lastName") + ", " + results.getString("age") + ", " + results.getString("birthdate") + ", " +
+                        results.getString("comments") + ", " + results.getString("locationID") + ", " + results.getString("gender")
+                        + ", " + results.getString("entryDate"));
+                disasterVictims.append('\n');
+            }
 
-        while (results.next()) {
-            disasterVictims.append(results.getString("id") + ", " + results.getString("firstName") + ", " +
-                    results.getString("lastName") + ", " + results.getString("age") + ", " + results.getString("birthdate") + ", " +
-                    results.getString("comments") + ", " + results.getString("locationID") + ", " + results.getString("gender")
-                    + ", " + results.getString("entryDate"));
-            disasterVictims.append('\n');
+            myStmt.close();
+
+            return disasterVictims.toString();
+
+
+        }
+        else {
+            query = "SELECT * FROM disastervictim WHERE locationid =(?)";
+            PreparedStatement myStmt = dbConnect.prepareStatement(query);
+            myStmt.setInt(1, locationID);
+            results = myStmt.executeQuery();
+            disasterVictims.append("*************************************************************************************\n");
+            disasterVictims.append("id, first name, last name, age, birthdate, comments, location id, gender, entry date \n");
+            disasterVictims.append("*************************************************************************************\n");
+
+            while (results.next()) {
+                disasterVictims.append(results.getString("id") + ", " + results.getString("firstName") + ", " +
+                        results.getString("lastName") + ", " + results.getString("age") + ", " + results.getString("birthdate") + ", " +
+                        results.getString("comments") + ", " + results.getString("locationID") + ", " + results.getString("gender")
+                        + ", " + results.getString("entryDate"));
+                disasterVictims.append('\n');
+            }
+
+            myStmt.close();
+            return  disasterVictims.toString();
+
         }
 
-        myStmt.close();
-
-        return disasterVictims.toString();
     }
 
+    public void setCurrentDisasterVictims() throws SQLException {
+        ArrayList<DisasterVictim> disasterVictims = new ArrayList<>();
+        String query = "SELECT * FROM disastervictim";
 
+
+        Statement myStmt = dbConnect.createStatement();
+        results = myStmt.executeQuery(query);
+        while (results.next()) {
+            int id = results.getInt("id");
+            String firstName = results.getString("firstName");
+            String entryDate = results.getString("entryDate");
+
+            DisasterVictim disasterVictim = new DisasterVictim(id, firstName, entryDate);
+
+            disasterVictims.add(disasterVictim);
+
+
+        }
+
+        currentDisasterVictims = disasterVictims;
+        for (DisasterVictim disasterVictim: currentDisasterVictims){
+            ensureFamilyRelationsWholenessForVictim(disasterVictim.getAssignedSocialID());
+        }
+        for (DisasterVictim disasterVictim: currentDisasterVictims){
+            int personOneID = disasterVictim.getAssignedSocialID();
+            for (FamilyRelation familyRelation: disasterVictim.getFamilyConnections()){
+                int personTwoID = familyRelation.getPersonTwo().getAssignedSocialID();
+                try{
+                    addFamilyRelation(personOneID,personTwoID, familyRelation.getRelationshipTo());
+                } catch (SQLException e){
+                    System.out.println("Loading relationships..");
+                }
+            }
+        }
+        myStmt.close();
+    }
+
+//    public boolean relationshipExistsInDatabase(int person1, int person2)  throws SQLException{
+//        ArrayList<DisasterVictim> disasterVictims = new ArrayList<>();
+//        String query = "SELECT * FROM disastervictim";
+//
+////        t(Statement statement = dbConnect.createStatement();
+////             ResultSet resultSet = statement.executeQuery(query)) {
+////            while (resultSet.next()) {
+////                int id = resultSet.getInt("id");
+////                String firstName = resultSet.getString("firstName");
+////                String entryDate = resultSet.getString("entryDate");
+////
+////                DisasterVictim disasterVictim = new DisasterVictim(id, firstName, entryDate);
+////
+////                disasterVictims.add(disasterVictim);
+//            }
+////return true;
+//
+//        }
+//    }
+    public void ensureFamilyRelationsWholenessForVictim(int victimId) throws SQLException {
+        List<FamilyRelation> familyRelations = new ArrayList<>();
+        String query = "SELECT * FROM familyrelations WHERE firstperson = ? OR secondperson = ?";
+        try (PreparedStatement statement = dbConnect.prepareStatement(query)) {
+            statement.setInt(1, victimId);
+            statement.setInt(2, victimId);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                int firstPersonId = resultSet.getInt("firstperson");
+                int secondPersonId = resultSet.getInt("secondperson");
+                String relationship = resultSet.getString("relationship");
+                DisasterVictim disasterVictimOne;
+                DisasterVictim disasterVictimTwo;
+                if (firstPersonId == victimId) {
+                    disasterVictimOne = getDisasterVictim(firstPersonId);
+                    disasterVictimTwo = getDisasterVictim(secondPersonId);
+                } else {
+                    disasterVictimOne = getDisasterVictim(secondPersonId);
+                    disasterVictimTwo = getDisasterVictim(firstPersonId);
+                }
+                FamilyRelation familyRelation;
+                if (relationship.equals("siblings")) {
+                    familyRelation = new SiblingRelation(disasterVictimOne, disasterVictimTwo);
+                } else if (relationship.equals("parent-child")) {
+                    familyRelation = new ParentChildRelation(disasterVictimOne, disasterVictimTwo);
+                } else if (relationship.equals("married")) {
+                    familyRelation = new MarriageRelation(disasterVictimOne, disasterVictimTwo);
+                } else {
+                    familyRelation = new FamilyRelation(disasterVictimOne, disasterVictimTwo);
+                }
+                disasterVictimOne.addFamilyConnection(familyRelation);
+
+            }
+        }
+
+    }
+
+    public DisasterVictim getDisasterVictim(int id){
+        for (DisasterVictim disasterVictim: currentDisasterVictims){
+            if (disasterVictim.getAssignedSocialID()== id){
+                return disasterVictim;
+            }
+        } return null;
+    }
     public String selectDisasterVictimsIDAndName() throws SQLException {
         StringBuffer disasterVictims = new StringBuffer();
 
@@ -127,18 +288,25 @@ public class DisasterVictimEntry {
                     results.getString("comments") + ", " + results.getString("locationID") + ", " + results.getString("gender")
                     + ", " + results.getString("entryDate"));
             disasterVictim.append('\n');
-            }
+        }
         myStmt.close();
         return disasterVictim.toString();
     }
 
 
-    public String searchDisasterVictimByName(String name) throws SQLException {
+    public String searchDisasterVictimByName(String name, int locationID) throws SQLException {
         StringBuffer disasterVictim = new StringBuffer();
-        String query = "SELECT * FROM disastervictim WHERE firstName ILIKE (?) or lastName ILIKE(?)";
-        PreparedStatement myStmt = dbConnect.prepareStatement(query);
+        String query;
+        PreparedStatement myStmt;
+        if (locationID == 0){
+            query = "SELECT * FROM disastervictim WHERE firstName ILIKE (?)";
+            myStmt = dbConnect.prepareStatement(query);
+        }else {
+            query = "SELECT * FROM disastervictim WHERE firstName ILIKE (?)  and locationid = (?)";
+            myStmt = dbConnect.prepareStatement(query);
+            myStmt.setInt(2, locationID);
+        }
         myStmt.setString(1, "%" + name + "%");
-        myStmt.setString(2, "%" + name + "%");
 
         results = myStmt.executeQuery();
         disasterVictim.append("*************************************************************************************\n");
@@ -151,12 +319,13 @@ public class DisasterVictimEntry {
                     + ", " + results.getString("entryDate"));
             disasterVictim.append('\n');
         }
+        myStmt.close();
         return disasterVictim.toString();
     }
 
 
-    public void insertDisasterVictim(int id,String firstName, String lastName, String age, String birthdate, String comments, String locationID,
-                                     String gender, String entryDate) throws SQLException{
+    public void insertDisasterVictim(int id, String firstName, String lastName, String age, String birthdate, String comments, String locationID,
+                                     String gender, String entryDate) throws SQLException {
 
         String query = "INSERT INTO disastervictim (firstName, lastName, age, birthdate, comments, locationID, gender, entryDate, id) VALUES (?,?,?,?,?,?,?,?,?)";
         PreparedStatement myInsertionStmt = dbConnect.prepareStatement(query);
@@ -177,13 +346,13 @@ public class DisasterVictimEntry {
             myInsertionStmt.setDate(4, birth);
         } else {
             myInsertionStmt.setDate(4, null);
-            }
+        }
         if (age != null) {
             int victimAge = Integer.parseInt(age);
             myInsertionStmt.setInt(3, victimAge);
         } else {
             myInsertionStmt.setNull(3, java.sql.Types.INTEGER);
-            }
+        }
 
         int rowCount = myInsertionStmt.executeUpdate();
         System.out.println("Rows affected: " + rowCount);
@@ -203,7 +372,7 @@ public class DisasterVictimEntry {
 
     }
 
-    public void addDisasterVictimMedicalRecord(int victimID, String details, String treatmentDate, int locationID) throws SQLException{
+    public void addDisasterVictimMedicalRecord(int victimID, String details, String treatmentDate, int locationID) throws SQLException {
         String query = "INSERT INTO medicalrecord (victimID, details, treatmentDate, locationID) VALUES (?,?,?,?)";
         PreparedStatement myStmt = dbConnect.prepareStatement(query);
         myStmt.setInt(1, victimID);
@@ -236,7 +405,7 @@ public class DisasterVictimEntry {
 
     }
 
-    public String selectMedicalRecords() throws SQLException{
+    public String selectMedicalRecords() throws SQLException {
         StringBuffer medicalRecords = new StringBuffer();
 
         String query = "SELECT * FROM medicalrecord";
@@ -255,40 +424,43 @@ public class DisasterVictimEntry {
         return medicalRecords.toString();
     }
 
-    public String selectVictimDietaryRestrictions()  throws SQLException {
+    public String selectVictimDietaryRestrictions(int locationID) throws SQLException {
         StringBuffer victimDietaryRestrictions = new StringBuffer();
 
         victimDietaryRestrictions.append("**********************************************\n");
         victimDietaryRestrictions.append("victimID, firstName, lastName, restriction\n");
         victimDietaryRestrictions.append("**********************************************\n");
 
-        String query = "SELECT DISTINCT disastervictim.id, disastervictim.firstName,disastervictim.lastName, dietary_restrictions.restriction_name " +
-                    "FROM disastervictim, dietary_restrictions, victim_dietary_restrictions " +
-                    "WHERE disastervictim.id = victim_dietary_restrictions.victimid " +
-                    "AND victim_dietary_restrictions.restrictionid = dietary_restrictions.id;";
+        String query = "SELECT disastervictim.id, disastervictim.firstName,disastervictim.lastName, dietary_restrictions.restriction_name " +
+                "FROM disastervictim, dietary_restrictions, victim_dietary_restrictions " +
+                "WHERE disastervictim.id = victim_dietary_restrictions.victimid " +
+                "AND victim_dietary_restrictions.restrictionid = dietary_restrictions.id AND disastervictim.locationid = (?)";
         PreparedStatement myStmt = dbConnect.prepareStatement(query);
+        myStmt.setInt(1,locationID );
         results = myStmt.executeQuery();
         while (results.next()) {
             victimDietaryRestrictions.append(results.getString("id") + ", " + results.getString("firstName") + ", " +
-                        results.getString("lastName") + ", " + results.getString("restriction_name"));
+                    results.getString("lastName") + ", " + results.getString("restriction_name"));
             victimDietaryRestrictions.append("\n");
         }
         myStmt.close();
 
-       return victimDietaryRestrictions.toString();
+        return victimDietaryRestrictions.toString();
     }
 
 
-    public String selectDisasterVictimByDietaryRestriction(int id) throws SQLException{
+    public String selectDisasterVictimByDietaryRestriction(int restrictionID, int locationID) throws SQLException {
         StringBuffer disasterVictims = new StringBuffer();
 
         String query = "SELECT  disastervictim.id, disastervictim.firstName, disastervictim.lastName " +
                 "FROM disastervictim, dietary_restrictions, victim_dietary_restrictions " +
                 "WHERE disastervictim.id = victim_dietary_restrictions.victimid " +
                 "AND victim_dietary_restrictions.restrictionid = dietary_restrictions.id " +
-                "AND dietary_restrictions.id = ?";
+                "AND dietary_restrictions.id = ? AND disastervictim.locationid = ?";
         PreparedStatement myStmt = dbConnect.prepareStatement(query);
-        myStmt.setInt(1, id);
+        myStmt.setInt(1, restrictionID);
+        myStmt.setInt(2, locationID);
+
         results = myStmt.executeQuery();
         disasterVictims.append("***************************************\n");
         disasterVictims.append("victimID, firstName, lastName\n");
@@ -360,54 +532,11 @@ public class DisasterVictimEntry {
 
         return familyRelation.toString();
     }
-    public static void main(String[] args) {
-
-//        DisasterVictimEntry myJDBC = new DisasterVictimEntry();
-//        try {
-//            myJDBC.createConnection();
-//        } catch(SQLException ex){
-//
-//        }
-        /*
-        String disasterVictims = myJDBC.selectDisasterVictimsIDAndName();
-        System.out.println(disasterVictims);
-        String Bob = myJDBC.searchDisasterVictimByID(1);
-        System.out.println(Bob);
 
 
-        String Demi = myJDBC.searchDisasterVictimByName("Demi");
-        System.out.println(Demi);
 
 
-        myJDBC.insertDisasterVictim("Ari",null,null,"2000-12-18",null, "1",null, "2024-02-29");
-
-        myJDBC.deleteDisasterVictim(5);
-        String disasterVictims = myJDBC.selectDisasterVictims();
 
 
-        myJDBC.addDisasterVictimMedicalRecord(1, "Excessive coughing", "2024-03-01", 1);
-        myJDBC.addDisasterVictimMedicalRecord(2, "Severely dehydrated", "2024-02-29", 1);
-
-
-        String medicalrecords = myJDBC.selectMedicalRecords();
-        System.out.println(medicalrecords);
-
-        String dietaryRestrictions = myJDBC.selectVictimDietaryRestrictions();
-        System.out.println(dietaryRestrictions);
-
-        String disasterVictimsWithDietaryRestrictions = myJDBC.selectDisasterVictimByDietaryRestriction(3);
-        System.out.println(disasterVictimsWithDietaryRestrictions);
-
-        myJDBC.addDisasterVictimDietaryRestriction(4,2);
-        String dietaryRestrictions = myJDBC.selectVictimDietaryRestrictions();
-        System.out.println(dietaryRestrictions);
-
-
-        String disasterVictimsWithDietaryRestrictions = myJDBC.selectDisasterVictimByDietaryRestriction(2);
-        System.out.println(disasterVictimsWithDietaryRestrictions);
-
-        myJDBC.addFamilyRelation(1,2,"siblings");
-         */
-       // System.out.println(myJDBC.selectFamilyRelationsByID(3));
-    }
 }
+

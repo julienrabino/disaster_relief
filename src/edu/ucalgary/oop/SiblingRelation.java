@@ -2,7 +2,7 @@ package edu.ucalgary.oop;
 
 public class SiblingRelation extends FamilyRelation {
 
-    private static String relationshipTo = "sibling";
+    private static String relationshipTo = "siblings";
 
     public SiblingRelation(DisasterVictim personOne, DisasterVictim personTwo){
         super(personOne, personTwo);

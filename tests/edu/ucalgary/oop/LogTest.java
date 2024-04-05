@@ -47,9 +47,16 @@ public class LogTest {
 
     }
     @Test (expected = IllegalArgumentException.class)
-    public void testConstructorWithoutMissingPersonWithInvalidDate(){
+    public void testConstructorWithoutMissingPersonWithInvalidDateFormat(){
         Log newLog = new Log(invalidDate, logDetails);
         // Expecting IllegalArgumentException due to invalid date format.
+
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void testConstructorWithoutMissingPersonWithInvalidDate(){
+        Log newLog = new Log("20200-11-22", logDetails);
+        // Expecting IllegalArgumentException due to invalid date.
 
     }
 
@@ -61,17 +68,16 @@ public class LogTest {
     */
 
     @Test(expected = IllegalArgumentException.class)
-    public void testSetDateWithInvalidDate() {
+    public void testSetDateWithInvalidDateFormat() {
         log.setDate(invalidDate); // This should throw IllegalArgumentException due to invalid format
     }
+    @Test(expected = IllegalArgumentException.class)
+    public void testSetDateWithInvalidDate() {
+        log.setDate("20000-11-11"); // This should throw IllegalArgumentException due to invalid format
+    }
 
-    /*
-       testSetDateWithValidDate:
-           - Verifies that setDate method sets the date correctly when a valid date is used.
-           - Expected Result: The date of inquiry should be updated to the new valid date.
-       */
     @Test
-    public void testSetDateWithValidDate() {
+    public void testSetDateWithValidDateFormat() {
         log.setDate("2024-02-11");
 
         assertEquals("date of log should be updated to the new date", "2024-02-11", log.getDate());

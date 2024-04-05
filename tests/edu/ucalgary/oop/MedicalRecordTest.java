@@ -17,6 +17,7 @@ public class MedicalRecordTest {
     private String inValidDateOfTreatment = "2024/02/04";
     MedicalRecord medicalRecord = new MedicalRecord(expectedLocation, expectedTreatmentDetails, expectedDateOfTreatment);
 
+    MedicalRecord medicalRecordWithoutLocation = new MedicalRecord(expectedTreatmentDetails,expectedDateOfTreatment);
     /*
        testConstructorWithValidDate:
           - Verifies that the constructor successfully creates a MedicalRecord object with a valid date.
@@ -27,20 +28,27 @@ public class MedicalRecordTest {
         assertNotNull("constructor should have made a new MedicalRecord object",medicalRecord);
     }
 
+    @Test
+    public void testConstructorWithoutLocation() {
+        assertNotNull("constructor should have made a new MedicalRecord object",medicalRecordWithoutLocation);
+    }
 
-    /*
-    testConstructorWithInvalidDate:
-       - Verifies that an IllegalArgumentException is thrown when creating a MedicalRecord object with an invalid date format.
-       - Expected Result: Expecting IllegalArgumentException
-     */
+
+
     @Test (expected = IllegalArgumentException.class)
-    public void testConstructorWithInvalidDate(){
+    public void testConstructorWithInvalidDateFormat(){
         MedicalRecord invalidMedicalRecord = new MedicalRecord(expectedLocation, expectedTreatmentDetails,inValidDateOfTreatment);
         // Expecting IllegalArgumentException due to invalid date format
 
     }
 
-	
+    @Test (expected = IllegalArgumentException.class)
+    public void testConstructorWithInvalidDate(){
+        MedicalRecord invalidMedicalRecord = new MedicalRecord(expectedLocation, expectedTreatmentDetails,"20000-11-111");
+        // Expecting IllegalArgumentException due to invalid date
+
+    }
+
     @Test
     public void testGetLocation() {
     assertEquals("getLocation should return the correct Location", expectedLocation, medicalRecord.getLocation());
@@ -108,6 +116,13 @@ public class MedicalRecordTest {
         String message = "setDateOfTreatment() should throw an IllegalArgumentException with invalid date format '" + inValidDateOfTreatment + "' but " + failureReason + ".";
         assertTrue(message, correctValue);
     }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void testSetDateOfTreatmentWithInvalidDate() {
+
+        medicalRecord.setDateOfTreatment("20200-11-11"); // Should not throw an exception
+    }
+
 
 
     /*
