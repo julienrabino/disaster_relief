@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
+
 import java.util.Arrays;
 
 
@@ -195,9 +196,9 @@ public class DisasterVictimTest {
         SiblingRelation relationshipJohnJane = new SiblingRelation(John, Jane);
 
         assertTrue("Jane's family connections should now include the newly added relationship",Jane.getFamilyConnections().contains(relationshipJaneJohn));
-        assertEquals("John's family connections should also include the newly added relationship", John.getFamilyConnections().getFirst().getPersonTwo(), Jane);
-        assertEquals("Jane's relation with John should be the same as John's relation with Jane in John's familyConnections", John.getFamilyConnections().getFirst().getRelationshipTo(),
-                Jane.getFamilyConnections().getFirst().getRelationshipTo());
+        assertEquals("John's family connections should also include the newly added relationship", John.getFamilyConnections().get(0).getPersonTwo(), Jane);
+        assertEquals("Jane's relation with John should be the same as John's relation with Jane in John's familyConnections", John.getFamilyConnections().get(0).getRelationshipTo(),
+                Jane.getFamilyConnections().get(0).getRelationshipTo());
     }
 
 
@@ -278,10 +279,10 @@ public class DisasterVictimTest {
 
         victim1.setFamilyConnections(newFamilyRelations);
 
-        assertEquals("victim1's family connections should contain the added Hashset that includes the relation with victim2",relation1, victim1.getFamilyConnections().getFirst());
-        assertEquals("victim2's family connections should include the reciprocal relation with victim1", victim2.getFamilyConnections().getFirst().getPersonTwo(), victim1);
-        assertEquals("victim2's relation with victim1 should be the same as victim1's relation with victim2", victim2.getFamilyConnections().getFirst().getRelationshipTo(),
-                victim1.getFamilyConnections().getFirst().getRelationshipTo());
+        assertEquals("victim1's family connections should contain the added Hashset that includes the relation with victim2",relation1, victim1.getFamilyConnections().get(0));
+        assertEquals("victim2's family connections should include the reciprocal relation with victim1", victim2.getFamilyConnections().get(0).getPersonTwo(), victim1);
+        assertEquals("victim2's relation with victim1 should be the same as victim1's relation with victim2", victim2.getFamilyConnections().get(0).getRelationshipTo(),
+                victim1.getFamilyConnections().get(0).getRelationshipTo());
 
 
 
@@ -313,9 +314,9 @@ public class DisasterVictimTest {
 
         int expectedRemainingQuantity = supplyInLocation.getQuantity() - 2*supplyToAdd.getQuantity();
         assertEquals("victim's personal belongings should include the newly added supply and that supply's type should be the same as the one added"
-                ,victim1.getPersonalBelongings().getFirst().getType(), "Emergency Kit");
-        assertEquals("victim's personal belongings should include the newly added supply with correct quantity",victim1.getPersonalBelongings().getFirst().getQuantity(),2);
-        assertEquals("victim's location should have a reduced quantity of the supply that was allocated to the victim",location.getSupplies().getFirst().getQuantity(), expectedRemainingQuantity);
+                ,victim1.getPersonalBelongings().get(0).getType(), "Emergency Kit");
+        assertEquals("victim's personal belongings should include the newly added supply with correct quantity",victim1.getPersonalBelongings().get(0).getQuantity(),2);
+        assertEquals("victim's location should have a reduced quantity of the supply that was allocated to the victim",location.getSupplies().get(0).getQuantity(), expectedRemainingQuantity);
 
 
 
@@ -341,7 +342,7 @@ public class DisasterVictimTest {
         victim.addPersonalBelonging(supplyToAdd, false);
         victim.addPersonalBelonging(supplyToAdd, false);
         assertEquals("There should still only be one supply type (Emergency Kit) in victim's personal belongings",victim.getPersonalBelongings().size(), 1);
-        assertEquals("victim should have 3 emergency kits after correct incrementation/addition of Emergency Kits",victim.getPersonalBelongings().getFirst().getQuantity(), 3);
+        assertEquals("victim should have 3 emergency kits after correct incrementation/addition of Emergency Kits",victim.getPersonalBelongings().get(0).getQuantity(), 3);
 
 
 
@@ -389,7 +390,7 @@ public class DisasterVictimTest {
         victim.addPersonalBelonging(supply,false);
         victim.removePersonalBelonging(supply);
 
-        assertEquals("victim's emergency kit quantity should be 2 after adding 3 kits and then removing 1", victim.getPersonalBelongings().getFirst().getQuantity(),2);
+        assertEquals("victim's emergency kit quantity should be 2 after adding 3 kits and then removing 1", victim.getPersonalBelongings().get(0).getQuantity(),2);
 
 
 
@@ -419,7 +420,7 @@ public class DisasterVictimTest {
         assertTrue("victim's personal belongings should be updated to the new list of supplies",victim.getPersonalBelongings().containsAll(supplies));
         assertEquals("victim's personal belongings should contain exactly the same number of elements as the supplies ArrayList", supplies.size(), victim.getPersonalBelongings().size());
 
-        assertEquals("victim's location should have a reduced quantity of the emergency kits after allocating supply to victim",29, location.getSupplies().getFirst().getQuantity());
+        assertEquals("victim's location should have a reduced quantity of the emergency kits after allocating supply to victim",29, location.getSupplies().get(0).getQuantity());
         assertEquals("victim's location should have a reduced quantity of the toothbrushes after allocating supply to victim",29, location.getSupplies().get(1).getQuantity());
 
 

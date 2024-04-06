@@ -4,7 +4,7 @@ public class Inquirer implements Person {
     private String FIRST_NAME;
     private String LAST_NAME;
     private String SERVICES_PHONE;
-    public static int counter = LoggingQueries.inquirerCurrentIDCount;
+    public static int counter = QueryLogger.inquirerCurrentIDCount;
     public int id;
     
     public Inquirer(String FIRST_NAME, String LAST_NAME, String SERVICES_PHONE){

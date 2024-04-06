@@ -194,7 +194,7 @@ public class DisasterVictim implements Person{
 	public void setGender(String gender){
 		for (String genderOption: genderOptions){
 			if (gender.equalsIgnoreCase(genderOption)){
-				this.gender = gender;
+				this.gender = genderOption;
 				return;
 			}
 

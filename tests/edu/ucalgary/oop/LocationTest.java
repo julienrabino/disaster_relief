@@ -115,7 +115,7 @@ public class LocationTest {
     public void testAddSupply() {
         Location location = new Location("123","ABC");
         location.addSupply(supply);
-        assertEquals("addSupply should add a supply to the supplies list", location.getSupplies().getFirst().getType(),"Water Bottle");
+        assertEquals("addSupply should add a supply to the supplies list", location.getSupplies().get(0).getType(),"Water Bottle");
 
     }
     /*
@@ -134,7 +134,7 @@ public class LocationTest {
         location.addSupply(newSupply);
         location.addSupply(newSupply);
         assertEquals("addSupply should increase the quantity of water bottle to 34", 34,
-                location.getSupplies().getFirst().getQuantity());
+                location.getSupplies().get(0).getQuantity());
     }
 
 
@@ -169,7 +169,7 @@ public class LocationTest {
         location.removeSupply(supplyToRemove);
         location.removeSupply(supplyToRemove);
         assertEquals("removeSupply should decrease the quantity of water bottle to 2 since 8 'Water Bottles' are removed", 2,
-                location.getSupplies().getFirst().getQuantity());
+                location.getSupplies().get(0).getQuantity());
     }
 
 
@@ -204,9 +204,9 @@ public class LocationTest {
         location.addOccupant(victim,false);
 
         location.allocateSupplyToVictim(victim, supplyToAllocate);
-        assertEquals("allocateSupplyToVictim should remove 2 quantities from the supply", 8, location.getSupplies().getFirst().getQuantity());
-        assertEquals("allocateSupplyToVictim should add supply to victim's personalBelongings", victim.getPersonalBelongings().getFirst().getType(),"Water Bottle");
-        assertEquals("victim should have 2 water bottles in their personalBelongings", victim.getPersonalBelongings().getFirst().getQuantity(),2);
+        assertEquals("allocateSupplyToVictim should remove 2 quantities from the supply", 8, location.getSupplies().get(0).getQuantity());
+        assertEquals("allocateSupplyToVictim should add supply to victim's personalBelongings", victim.getPersonalBelongings().get(0).getType(),"Water Bottle");
+        assertEquals("victim should have 2 water bottles in their personalBelongings", victim.getPersonalBelongings().get(0).getQuantity(),2);
     }
 }
 

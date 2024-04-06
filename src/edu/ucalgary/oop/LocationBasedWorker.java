@@ -23,8 +23,7 @@ public class LocationBasedWorker {
         try {
             DVEntry.createConnection();
             DVEntry.initializeCurrentIDCount();
-        } catch (
-                SQLException ex) {
+        } catch (SQLException ex) {
             System.out.println("An error has occurred while trying to create a connection to the database. Try again.");
             return;
         }
@@ -45,7 +44,7 @@ public class LocationBasedWorker {
                     locationID = null;
                 } else {
                     String locationName = DVEntry.getLocationNameFromID(Integer.parseInt(locationID));
-                    System.out.println("Your location set to: " + locationName);
+                    System.out.println("Your location set to: " + locationName +"\n");
                     break;
                 }
             }
@@ -59,16 +58,23 @@ public class LocationBasedWorker {
         while (!exit) {
             String choice;
             System.out.println("*** LOCATION BASED RELIEF WORKER ***");
+            System.out.println("******************************************************");
+
             System.out.println("1. Add a Disaster Victim");
             System.out.println("2. View all Disaster Victims");
             System.out.println("3. Search for Disaster Victims");
+            System.out.println("******************************************************");
             System.out.println("4. Add Disaster Victim Medical Records");
             System.out.println("5. Search for Disaster Victim Medical Records");
+            System.out.println("******************************************************");
             System.out.println("6. Search for Disaster Victims with Dietary Restrictions");
-            System.out.println("7. View All Disaster Victim Dietary Restrictions");
-            System.out.println("8. Add Disaster Victim Family Relations");
-            System.out.println("9. View Disaster Victim Family Relationships");
-            System.out.println("10. Exit");
+            System.out.println("7. View all Disaster Victim Dietary Restrictions");
+            System.out.println("******************************************************");
+            System.out.println("8. Add Disaster Victim Family Relationship");
+            System.out.println("9. Search Disaster Victim Family Relationships");
+            System.out.println("10. View all Disaster Victim Family Relationships (across all locations)");
+            System.out.println("******************************************************");
+            System.out.println("11. Exit");
 
             choice = reader.readLine();
 
@@ -187,6 +193,7 @@ public class LocationBasedWorker {
 
                                 System.out.println("Enter the gender.");
                                 String gender = reader.readLine();
+                                gender = gender.toLowerCase();
                                 try {
                                     disasterVictim.setGender(gender.trim());
                                     break;
@@ -222,6 +229,7 @@ public class LocationBasedWorker {
                                 age = null;
                             }
                             DVEntry.insertDisasterVictim(id, firstName, lastName, age, birthdate, comments, locationID, gender, entryDate);
+                            System.out.println("Insertion of victim successful (ID: " + id+")");
                             break;
                         } catch (SQLException ex) {
                             System.out.println("Insertion of victim failed. Trying again..");
@@ -466,7 +474,7 @@ public class LocationBasedWorker {
 
                         System.out.println("Enter a dietary restriction.");
                         choice = reader.readLine();
-                        if (Integer.parseInt(choice) >= 1 || Integer.parseInt(choice) <= 9) {
+                        if (Integer.parseInt(choice) >= 1 && Integer.parseInt(choice) <= 9) {
                             try {
                                 String results = DVEntry.selectDisasterVictimByDietaryRestriction(Integer.parseInt(choice), Integer.parseInt(locationID));
                                 System.out.println(results);
@@ -533,8 +541,8 @@ public class LocationBasedWorker {
                     }
                     System.out.println("What is the nature of their relationship?\n1. Siblings\n2. Married\n3. Parent-Child\n4. Other\n(ENTER THE NUMBER CORRESPONDING TO THE RELATIONSHIP)");
                     String relationshipType = reader.readLine();
-
-                    if (Integer.parseInt(relationshipType) >= 1 || Integer.parseInt(relationshipType) <= 4) {
+                    while (true){
+                    if (Integer.parseInt(relationshipType) >= 1 &&Integer.parseInt(relationshipType) <= 4) {
                         try {
                             if (relationshipType.equals("1")) {
                                 relationshipType = "siblings";
@@ -547,9 +555,14 @@ public class LocationBasedWorker {
                             }
                             DVEntry.addFamilyRelation(Integer.parseInt(victimID1), Integer.parseInt(victimID2), relationshipType);
                             DVEntry.setCurrentDisasterVictims();
+                            break;
                         } catch (SQLException ex) {
                             System.out.println("An error has occurred. Relationship already exists.");
+                            break;
                         }
+                    }else {
+                        System.out.println("Please choose one of the above options.");
+                    }
                     }
 
                     pressEnter();
@@ -578,8 +591,21 @@ public class LocationBasedWorker {
                     pressEnter();
                     break;
                 case "10":
+                    System.out.println("*** VIEW ALL DISASTER VICTIM FAMILY RELATIONSHIPS ***");
+                    try {
+                        String results = DVEntry.selectFamilyRelations();
+                        System.out.println(results);
+                    } catch (SQLException e) {
+                        System.out.println("An error has occurred.");
+                        pressEnter();
+                        break;
+                    }
+                    pressEnter();
+                    break;
+                case "11":
                     exit = true;
                     pressEnter();
+                    DVEntry.close();
                     break;
             }
         }

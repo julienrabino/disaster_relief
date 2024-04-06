@@ -16,7 +16,7 @@ public class CentralBasedWorker {
 
     public static void main(String[] args) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        LoggingQueries inquirerQueries = new LoggingQueries();
+        QueryLogger inquirerQueries = new QueryLogger();
         DisasterVictimEntry DVEntry = new DisasterVictimEntry();
 
         try {
@@ -100,7 +100,7 @@ public class CentralBasedWorker {
                                 }
                                 break;
                             } else {
-                                System.out.println("The ID you have entered is invalid and does not exist. Try again");
+                                System.out.println("The ID you have entered is invalid and does not exist. Try again.");
                             }
                         } catch (SQLException e) {
                             System.out.println("An error has occurred.");
@@ -117,6 +117,28 @@ public class CentralBasedWorker {
 
                     pressEnter();
                     break;
+
+                case "4":
+                    System.out.println("*** ADD NEW INQUIRER ***");
+                    Inquirer inquirer;
+                    System.out.println("What is the inquirer's first name?");
+                    String firstName = reader.readLine();
+                    System.out.println("What is the inquirer's last name?");
+                    String lastName = reader.readLine();
+                    System.out.println("What is the inquirer's phone number? (XXX-XXX-XXXX)");
+                    String phoneNumber = reader.readLine();
+                    try{
+                        inquirerQueries.insertNewInquirer(firstName,lastName,phoneNumber);
+                        System.out.println("Inquirer now added to the database (ID: "+ inquirerQueries.inquirerCurrentIDCount +")");
+                    } catch (SQLException e){
+                        System.out.println("An error has occurred during insertion. Try again.");
+                    }
+                    pressEnter();
+                    break;
+
+
+
+
                 case "5":
                     System.out.println("*** SEARCH FOR DISASTER VICTIMS ***");
                     System.out.println("Enter your search (based on first name).");
@@ -129,7 +151,21 @@ public class CentralBasedWorker {
                     }
                     pressEnter();
                     break;
-
+                case "6":
+                    System.out.println("*** VIEW ALL DISASTER VICTIMS ***");
+                    try {
+                        String results = DVEntry.selectDisasterVictims(0);
+                        System.out.println(results);
+                    } catch (SQLException e) {
+                        System.out.println("An error has occurred, try again.");
+                    }
+                    pressEnter();
+                    break;
+                case "7":
+                    exit = true;
+                    pressEnter();
+                    inquirerQueries.close();
+                    break;
             }
 
 

@@ -3,7 +3,7 @@ package edu.ucalgary.oop;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class LoggingQueries{
+public class QueryLogger{
     private Connection dbConnect;
     private ResultSet results;
     public static int inquirerCurrentIDCount;
@@ -15,9 +15,9 @@ public class LoggingQueries{
     }
     public void initializeCurrentInquirerIDCount() throws SQLException {
         Statement myStmt = dbConnect.createStatement();
-        results = myStmt.executeQuery("SELECT MAX(id) FROM inquiry_log");
+        results = myStmt.executeQuery("SELECT MAX(id) FROM inquirer");
         results.next();
-        logIDCount = results.getInt(1);
+        inquirerCurrentIDCount = results.getInt(1);
         myStmt.close();
 
     }
@@ -25,7 +25,7 @@ public class LoggingQueries{
         Statement myStmt = dbConnect.createStatement();
         results = myStmt.executeQuery("SELECT MAX(id) FROM inquiry_log");
         results.next();
-        inquirerCurrentIDCount = results.getInt(1);
+        logIDCount = results.getInt(1);
         myStmt.close();
 
     }
@@ -86,9 +86,9 @@ public class LoggingQueries{
 
     }
 
-    public void insertNewInquirer(int id, String firstName, String lastName, String phoneNumber) {
-
-        try {
+    public void insertNewInquirer( String firstName, String lastName, String phoneNumber)  throws  SQLException{
+        inquirerCurrentIDCount++;
+        int id = inquirerCurrentIDCount;
 
             String query = "INSERT INTO inquirer (id, firstName, lastName, phoneNumber) VALUES (?,?,?,?)";
             PreparedStatement myStmt = dbConnect.prepareStatement(query);
@@ -103,9 +103,6 @@ public class LoggingQueries{
 
             myStmt.close();
 
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
     }
 
     public void insertNewInquiryLog(int inquirer, String callDate, String details) throws SQLException {

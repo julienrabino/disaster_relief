@@ -171,42 +171,52 @@ public class DisasterVictimEntry {
         }
 
         currentDisasterVictims = disasterVictims;
-        for (DisasterVictim disasterVictim: currentDisasterVictims){
+        for (DisasterVictim disasterVictim : currentDisasterVictims) {
             ensureFamilyRelationsWholenessForVictim(disasterVictim.getAssignedSocialID());
         }
-        for (DisasterVictim disasterVictim: currentDisasterVictims){
+        for (DisasterVictim disasterVictim : currentDisasterVictims) {
             int personOneID = disasterVictim.getAssignedSocialID();
-            for (FamilyRelation familyRelation: disasterVictim.getFamilyConnections()){
+            for (FamilyRelation familyRelation : disasterVictim.getFamilyConnections()) {
                 int personTwoID = familyRelation.getPersonTwo().getAssignedSocialID();
-                try{
-                    addFamilyRelation(personOneID,personTwoID, familyRelation.getRelationshipTo());
-                } catch (SQLException e){
-                    System.out.println("Loading relationships..");
+                if (!relationshipExistsInDatabase(personOneID, personTwoID)) {
+                    try {
+                        addFamilyRelation(personOneID, personTwoID, familyRelation.getRelationshipTo());
+                    } catch (SQLException e) {
+                        System.out.println("An error has occurred.");
+                    }
+                }
+            }
+            myStmt.close();
+        }
+    }
+    public boolean relationshipExistsInDatabase(int person1, int person2) throws SQLException {
+        boolean relationshipExists = false;
+        String query;
+        if (person1 < person2) {
+            query = "SELECT * FROM familyrelations WHERE firstperson = ? AND secondperson = ?";
+        } else if (person2 < person1) {
+            query = "SELECT * FROM familyrelations WHERE firstperson = ? AND secondperson = ?";
+            int temp = person1;
+            person1 = person2;
+            person2 = temp;
+        } else {
+
+            return true;
+        }
+
+        try (PreparedStatement myStmt = dbConnect.prepareStatement(query)) {
+            myStmt.setInt(1, person1);
+            myStmt.setInt(2, person2);
+            try (ResultSet results = myStmt.executeQuery()) {
+                if (results.next()) {
+                    relationshipExists = true;
                 }
             }
         }
-        myStmt.close();
+
+        return relationshipExists;
     }
 
-//    public boolean relationshipExistsInDatabase(int person1, int person2)  throws SQLException{
-//        ArrayList<DisasterVictim> disasterVictims = new ArrayList<>();
-//        String query = "SELECT * FROM disastervictim";
-//
-////        t(Statement statement = dbConnect.createStatement();
-////             ResultSet resultSet = statement.executeQuery(query)) {
-////            while (resultSet.next()) {
-////                int id = resultSet.getInt("id");
-////                String firstName = resultSet.getString("firstName");
-////                String entryDate = resultSet.getString("entryDate");
-////
-////                DisasterVictim disasterVictim = new DisasterVictim(id, firstName, entryDate);
-////
-////                disasterVictims.add(disasterVictim);
-//            }
-////return true;
-//
-//        }
-//    }
     public void ensureFamilyRelationsWholenessForVictim(int victimId) throws SQLException {
         List<FamilyRelation> familyRelations = new ArrayList<>();
         String query = "SELECT * FROM familyrelations WHERE firstperson = ? OR secondperson = ?";
@@ -424,6 +434,25 @@ public class DisasterVictimEntry {
         return medicalRecords.toString();
     }
 
+    public String selectFamilyRelations() throws SQLException {
+        StringBuffer familyRelations = new StringBuffer();
+
+        String query = "SELECT * FROM familyrelations";
+        PreparedStatement myStmt = dbConnect.prepareStatement(query);
+        results = myStmt.executeQuery();
+        familyRelations.append("*******************************************\n");
+        familyRelations.append("victim id, victim id, relationship\n");
+        familyRelations.append("********************************************\n");
+        while (results.next()) {
+            familyRelations.append(results.getString("firstperson") + ", " + results.getString("secondperson") + ", " +
+                    results.getString("relationship"));
+            familyRelations.append("\n");
+        }
+        myStmt.close();
+
+        return familyRelations.toString();
+    }
+
     public String selectVictimDietaryRestrictions(int locationID) throws SQLException {
         StringBuffer victimDietaryRestrictions = new StringBuffer();
 
@@ -532,7 +561,14 @@ public class DisasterVictimEntry {
 
         return familyRelation.toString();
     }
-
+    public void close() {
+        try {
+            results.close();
+            dbConnect.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 
